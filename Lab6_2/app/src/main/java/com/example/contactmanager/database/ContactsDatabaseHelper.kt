@@ -83,18 +83,19 @@ class ContactsDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATAB
         }
     }
 
-    fun deleteContact(contactId: Int): Int {
-        val db = writableDatabase
-        return db.delete(TABLE_CONTACTS, "$COLUMN_ID=?", arrayOf(contactId.toString()))
+    // Phương thức cập nhật liên hệ
+    fun updateContact(contact: Contact): Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put(COLUMN_NAME, contact.name)
+        values.put(COLUMN_PHONE, contact.phone)
+        values.put(COLUMN_EMAIL, contact.email)
+        return db.update(TABLE_CONTACTS, values, "$COLUMN_ID = ?", arrayOf(contact.id.toString()))
     }
 
-    fun updateContact(contact: Contact): Int {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_NAME, contact.name)
-            put(COLUMN_PHONE, contact.phone)
-            put(COLUMN_EMAIL, contact.email)
-        }
-        return db.update(TABLE_CONTACTS, values, "$COLUMN_ID=?", arrayOf(contact.id.toString()))
+    // Phương thức xóa liên hệ
+    fun deleteContact(contactId: Int): Int {
+        val db = this.writableDatabase
+        return db.delete(TABLE_CONTACTS, "$COLUMN_ID = ?", arrayOf(contactId.toString()))
     }
 }

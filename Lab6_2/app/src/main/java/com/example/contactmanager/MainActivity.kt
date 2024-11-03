@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             // Cập nhật ListView sau khi thêm danh bạ mới
             contactList.clear()
             contactList.addAll(databaseHelper.getAllContacts())
+            loadContacts()
             contactAdapter.notifyDataSetChanged()
         }
     }

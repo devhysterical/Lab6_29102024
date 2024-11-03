@@ -2,6 +2,7 @@ package com.example.notesmanager.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.notesmanager.models.Note
@@ -29,6 +30,31 @@ class NotesDatabaseHelper(context: Context) :
             )
         """.trimIndent()
         db?.execSQL(createTable)
+    }
+
+    // Hàm để lấy ghi chú theo ID
+    fun getNoteById(id: Int): Note? {
+        val db = readableDatabase
+        var note: Note? = null
+        val cursor: Cursor = db.query(
+            TABLE_NAME,
+            arrayOf(COLUMN_ID, COLUMN_TITLE, COLUMN_CONTENT, COLUMN_DATE),
+            "$COLUMN_ID = ?",
+            arrayOf(id.toString()),
+            null,
+            null,
+            null
+        )
+
+        if (cursor.moveToFirst()) {
+            val noteId = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+            val title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE))
+            val content = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CONTENT))
+            val date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE))
+            note = Note(noteId, title, content, date)
+        }
+        cursor.close()
+        return note
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -67,15 +93,15 @@ class NotesDatabaseHelper(context: Context) :
     fun updateNote(note: Note): Int {
         val db = writableDatabase
         val values = ContentValues().apply {
-            put(COLUMN_TITLE, note.title)
-            put(COLUMN_CONTENT, note.content)
-            put(COLUMN_DATE, note.date)
+            put("title", note.title)
+            put("content", note.content)
         }
-        return db.update(TABLE_NAME, values, "$COLUMN_ID=?", arrayOf(note.id.toString()))
+        return db.update("Notes", values, "id=?", arrayOf(note.id.toString()))
     }
 
-    fun deleteNoteById(id: Int): Int {
+    fun deleteNoteById(id: Int) {
         val db = writableDatabase
-        return db.delete(TABLE_NAME, "$COLUMN_ID=?", arrayOf(id.toString()))
+        db.delete("Notes", "id=?", arrayOf(id.toString()))
     }
+
 }
